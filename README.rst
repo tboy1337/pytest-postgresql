@@ -395,27 +395,45 @@ You can define a ``load`` function and pass it to your process fixture factory:
 
 The process fixture populates the **template database** once, and the client fixture clones it for every test. This is fast, clean, and ensures no dangling transactions. This approach works with both ``postgresql_proc`` and ``postgresql_noproc``.
 
-Docker-Based Testing
---------------------
+Cross-Platform Testing
+----------------------
 
-For running all tests including those requiring PostgreSQL binaries (``pg_ctl``), use Docker:
-
-.. code-block:: bash
-
-    python run-docker-tests.py
-
-This runs all 213 tests in a containerized environment with PostgreSQL 17 pre-installed, regardless of your host OS.
-
-Additional options:
+**The test suite automatically works on all platforms** - just run ``pytest``!
 
 .. code-block:: bash
 
-    python run-docker-tests.py tests/test_executor.py  # Run specific test file
-    python run-docker-tests.py --no-coverage           # Run without coverage
-    python run-docker-tests.py --build-only            # Only build Docker image
-    python run-docker-tests.py --no-build              # Skip build, use existing image
-    python run-docker-tests.py --quiet                 # Less verbose output
-    python run-docker-tests.py --help                  # Show all options
+    pytest                                # Works everywhere!
+    pytest tests/test_executor.py         # Run specific test file
+    pytest --cov=pytest_postgresql        # With coverage
+
+The test suite automatically detects your environment:
+
+- **Native PostgreSQL**: If ``pg_ctl`` is available, tests use your local PostgreSQL installation
+- **Docker fallback**: If ``pg_ctl`` is not available but Docker is running, tests automatically start a PostgreSQL container
+- **Graceful skipping**: Tests that specifically require ``pg_ctl`` will skip if neither is available
+
+You'll see automatic Docker startup in action:
+
+.. code-block:: text
+
+    $ pytest
+    [Docker] Auto-started Docker PostgreSQL for testing
+    ============================= test session starts ==============================
+    ... tests run ...
+    [Docker] Cleaning up auto-started Docker PostgreSQL...
+    ====================== 195 passed, 18 skipped in 23.41s =======================
+
+Manual Docker Control (Optional)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For explicit Docker control or CI/CD pipelines, use the helper script:
+
+.. code-block:: bash
+
+    python run-docker-tests.py                      # Explicit Docker run
+    python run-docker-tests.py --build-only         # Only build Docker image
+    python run-docker-tests.py --no-build           # Skip build, use existing image
+    python run-docker-tests.py --quiet              # Less verbose output
 
 For detailed documentation, see `docs/docker-testing.md <docs/docker-testing.md>`_.
 

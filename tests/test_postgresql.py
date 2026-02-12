@@ -1,22 +1,18 @@
 """All tests for pytest-postgresql."""
 
-import shutil
-
 import pytest
 from psycopg import Connection
 from psycopg.pq import ConnStatus
 
 from pytest_postgresql.executor import PostgreSQLExecutor
 from pytest_postgresql.retry import retry
+from tests.conftest import HAS_PG_CTL
 
 MAKE_Q = "CREATE TABLE test (id serial PRIMARY KEY, num integer, data varchar);"
 SELECT_Q = "SELECT * FROM test_load;"
 
 
-@pytest.mark.skipif(
-    not shutil.which("pg_ctl"),
-    reason="Requires pg_ctl - run via Docker: docker-compose -f docker-compose.tests.yml up"
-)
+@pytest.mark.skipif(not HAS_PG_CTL, reason="Requires pg_ctl (auto-starts via Docker if available)")
 def test_postgresql_proc(postgresql_proc: PostgreSQLExecutor) -> None:
     """Test different postgresql versions."""
     assert postgresql_proc.running() is True

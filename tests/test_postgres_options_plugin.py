@@ -1,6 +1,5 @@
 """Test behavior of postgres_options passed in different ways."""
 
-import shutil
 from pathlib import Path
 
 import pytest
@@ -11,14 +10,11 @@ from pytest_postgresql.executor import PostgreSQLExecutor
 from pytest_postgresql.factories import postgresql_proc
 from pytest_postgresql.factories.noprocess import xdistify_dbname
 from pytest_postgresql.janitor import DatabaseJanitor
+from tests.conftest import HAS_PG_CTL
 from tests.loader import load_database
 
-# Skip all plugin tests without pg_ctl since they use pytester
-# which spawns subprocess pytest sessions that need postgresql_proc
-pytestmark = pytest.mark.skipif(
-    not shutil.which("pg_ctl"),
-    reason="Requires pg_ctl - run via Docker: docker-compose -f docker-compose.tests.yml up"
-)
+# Skip all plugin tests when pg_ctl not available (uses pytester with subprocess)
+pytestmark = pytest.mark.skipif(not HAS_PG_CTL, reason="Requires pg_ctl (auto-starts via Docker if available)")
 
 
 @pytest.fixture
