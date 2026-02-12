@@ -15,10 +15,10 @@ postgresql_my_proc = pytest_postgresql.factories.noprocess.postgresql_noproc(
 postgres_with_schema = pytest_postgresql.factories.client.postgresql("postgresql_my_proc")
 
 postgresql_my_proc_template = pytest_postgresql.factories.noprocess.postgresql_noproc(
-    dbname="stories_templated", load=[load_database]
+    dbname="docker_stories_templated", load=[load_database]
 )
 postgres_with_template = pytest_postgresql.factories.client.postgresql(
-    "postgresql_my_proc_template", dbname="stories_templated"
+    "postgresql_my_proc_template", dbname="docker_stories_templated"
 )
 
 
