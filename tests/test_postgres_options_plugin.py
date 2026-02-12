@@ -14,7 +14,7 @@ from tests.conftest import HAS_PG_CTL
 from tests.loader import load_database
 
 # Skip all plugin tests when pg_ctl not available (uses pytester with subprocess)
-pytestmark = pytest.mark.skipif(not HAS_PG_CTL, reason="Requires pg_ctl (auto-starts via Docker if available)")
+pytestmark = pytest.mark.skipif(not HAS_PG_CTL, reason="Requires pg_ctl (runs in Docker if available)")
 
 
 @pytest.fixture

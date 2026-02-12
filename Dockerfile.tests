@@ -61,6 +61,7 @@ USER testuser
 # Set environment variables for PostgreSQL
 ENV POSTGRESQL_EXEC=/usr/lib/postgresql/17/bin/pg_ctl
 ENV TMPDIR=/tmp/pytest-postgresql
+ENV INSIDE_DOCKER=1
 
 # Default command runs all tests without coverage (use docker-compose command override for coverage)
 CMD ["pytest", "tests/", "-v", "--tb=short", "-p", "no:cov"]

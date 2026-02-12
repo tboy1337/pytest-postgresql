@@ -12,7 +12,7 @@ MAKE_Q = "CREATE TABLE test (id serial PRIMARY KEY, num integer, data varchar);"
 SELECT_Q = "SELECT * FROM test_load;"
 
 
-@pytest.mark.skipif(not HAS_PG_CTL, reason="Requires pg_ctl (auto-starts via Docker if available)")
+@pytest.mark.skipif(not HAS_PG_CTL, reason="Requires pg_ctl (runs in Docker if available)")
 def test_postgresql_proc(postgresql_proc: PostgreSQLExecutor) -> None:
     """Test different postgresql versions."""
     assert postgresql_proc.running() is True

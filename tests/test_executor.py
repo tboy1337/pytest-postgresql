@@ -80,7 +80,7 @@ def test_unsupported_version(request: FixtureRequest) -> None:
 
 @pytest.mark.xdist_group(name="executor_no_xdist_guard")
 @pytest.mark.parametrize("locale", ("en_US.UTF-8", "de_DE.UTF-8", "nl_NO.UTF-8"))
-@pytest.mark.skipif(not HAS_PG_CTL, reason="Requires pg_ctl (auto-starts via Docker if available)")
+@pytest.mark.skipif(not HAS_PG_CTL, reason="Requires pg_ctl (runs in Docker if available)")
 def test_executor_init_with_password(
     request: FixtureRequest,
     monkeypatch: pytest.MonkeyPatch,
@@ -108,7 +108,7 @@ def test_executor_init_with_password(
     assert_executor_start_stop(executor)
 
 
-@pytest.mark.skipif(not HAS_PG_CTL, reason="Requires pg_ctl (auto-starts via Docker if available)")
+@pytest.mark.skipif(not HAS_PG_CTL, reason="Requires pg_ctl (runs in Docker if available)")
 def test_executor_init_bad_tmp_path(
     request: FixtureRequest,
     tmp_path_factory: pytest.TempPathFactory,
@@ -137,7 +137,7 @@ def test_executor_init_bad_tmp_path(
 postgres_with_password = postgresql_proc(password="hunter2")
 
 
-@pytest.mark.skipif(not HAS_PG_CTL, reason="Requires pg_ctl (auto-starts via Docker if available)")
+@pytest.mark.skipif(not HAS_PG_CTL, reason="Requires pg_ctl (runs in Docker if available)")
 def test_proc_with_password(
     postgres_with_password: PostgreSQLExecutor,
 ) -> None:
@@ -171,7 +171,7 @@ postgresql_max_conns_proc = postgresql_proc(postgres_options="-N 42")
 postgres_max_conns = postgresql("postgresql_max_conns_proc")
 
 
-@pytest.mark.skipif(not HAS_PG_CTL, reason="Requires pg_ctl (auto-starts via Docker if available)")
+@pytest.mark.skipif(not HAS_PG_CTL, reason="Requires pg_ctl (runs in Docker if available)")
 def test_postgres_options(postgres_max_conns: Connection) -> None:
     """Check that max connections (-N 42) is honored."""
     cur = postgres_max_conns.cursor()
@@ -182,7 +182,7 @@ def test_postgres_options(postgres_max_conns: Connection) -> None:
 postgres_isolation_level = postgresql("postgresql_proc", isolation_level=psycopg.IsolationLevel.SERIALIZABLE)
 
 
-@pytest.mark.skipif(not HAS_PG_CTL, reason="Requires pg_ctl (auto-starts via Docker if available)")
+@pytest.mark.skipif(not HAS_PG_CTL, reason="Requires pg_ctl (runs in Docker if available)")
 def test_custom_isolation_level(postgres_isolation_level: Connection) -> None:
     """Check that a client fixture with a custom isolation level works."""
     cur = postgres_isolation_level.cursor()

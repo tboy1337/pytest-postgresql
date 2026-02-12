@@ -13,7 +13,7 @@ from pytest_postgresql.retry import retry
 from tests.conftest import HAS_PG_CTL
 
 
-@pytest.mark.skipif(not HAS_PG_CTL, reason="Requires pg_ctl (auto-starts via Docker if available)")
+@pytest.mark.skipif(not HAS_PG_CTL, reason="Requires pg_ctl (runs in Docker if available)")
 def test_noproc_version(postgresql_proc: PostgreSQLExecutor) -> None:
     """Test the way postgresql version is being read.
 
@@ -33,7 +33,7 @@ def test_noproc_version(postgresql_proc: PostgreSQLExecutor) -> None:
     assert postgresql_proc.version == noproc_version
 
 
-@pytest.mark.skipif(not HAS_PG_CTL, reason="Requires pg_ctl (auto-starts via Docker if available)")
+@pytest.mark.skipif(not HAS_PG_CTL, reason="Requires pg_ctl (runs in Docker if available)")
 def test_noproc_cached_version(postgresql_proc: PostgreSQLExecutor) -> None:
     """Test that the version is being cached."""
     postgresql_noproc = NoopExecutor(
