@@ -1,3 +1,20 @@
 [run]
 source = pytest_postgresql
 branch = True
+
+[report]
+# Exclude import lines and other non-executable code from coverage
+exclude_lines =
+    # Standard pragma
+    pragma: no cover
+    # Don't complain about missing debug-only code
+    def __repr__
+    # Don't complain if tests don't hit defensive assertion code
+    raise AssertionError
+    raise NotImplementedError
+    # Don't complain if non-runnable code isn't run
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+    # Exclude import statements only (keep actual code)
+    ^from .* import .*
+    ^import .*
