@@ -395,6 +395,27 @@ You can define a ``load`` function and pass it to your process fixture factory:
 
 The process fixture populates the **template database** once, and the client fixture clones it for every test. This is fast, clean, and ensures no dangling transactions. This approach works with both ``postgresql_proc`` and ``postgresql_noproc``.
 
+Docker-Based Testing
+--------------------
+
+For running all tests including those requiring PostgreSQL binaries (``pg_ctl``), use Docker:
+
+**Windows (PowerShell):**
+
+.. code-block:: powershell
+
+    .\run-docker-tests.ps1
+
+**Linux/macOS (Bash):**
+
+.. code-block:: bash
+
+    ./run-docker-tests.sh
+
+This runs all 213 tests in a containerized environment with PostgreSQL 17 pre-installed, regardless of your host OS.
+
+For detailed documentation, see `docs/docker-testing.md <docs/docker-testing.md>`_.
+
 Release
 =======
 

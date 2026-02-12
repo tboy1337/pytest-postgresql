@@ -1,5 +1,6 @@
 """Noproc fixture tests."""
 
+import os
 import pathlib
 
 import pytest
@@ -9,13 +10,28 @@ import pytest_postgresql.factories.client
 import pytest_postgresql.factories.noprocess
 from tests.loader import load_database
 
+# Read environment variables for Docker or default to localhost for native tests
+DOCKER_HOST = os.environ.get("POSTGRESQL_HOST", "localhost")
+DOCKER_PORT = int(os.environ.get("POSTGRESQL_PORT", "5433"))
+DOCKER_USER = os.environ.get("POSTGRESQL_USER", "postgres")
+DOCKER_PASSWORD = os.environ.get("POSTGRESQL_PASSWORD", "postgres")
+
 postgresql_my_proc = pytest_postgresql.factories.noprocess.postgresql_noproc(
+    host=DOCKER_HOST,
+    port=DOCKER_PORT,
+    user=DOCKER_USER,
+    password=DOCKER_PASSWORD,
     load=[pathlib.Path("tests/test_sql/eidastats.sql")]
 )
 postgres_with_schema = pytest_postgresql.factories.client.postgresql("postgresql_my_proc")
 
 postgresql_my_proc_template = pytest_postgresql.factories.noprocess.postgresql_noproc(
-    dbname="docker_stories_templated", load=[load_database]
+    host=DOCKER_HOST,
+    port=DOCKER_PORT,
+    user=DOCKER_USER,
+    password=DOCKER_PASSWORD,
+    dbname="docker_stories_templated",
+    load=[load_database]
 )
 postgres_with_template = pytest_postgresql.factories.client.postgresql(
     "postgresql_my_proc_template", dbname="docker_stories_templated"

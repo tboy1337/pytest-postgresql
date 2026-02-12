@@ -1,0 +1,53 @@
+services:
+  # Test runner with PostgreSQL binaries installed
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    volumes:
+      # Mount source code as writable to allow coverage file creation
+      - ./pytest_postgresql:/app/pytest_postgresql
+      - ./tests:/app/tests
+      - ./.coveragerc:/app/.coveragerc:ro
+      - ./pyproject.toml:/app/pyproject.toml:ro
+      # Bind mount coverage output directories
+      - ./htmlcov:/app/htmlcov
+    environment:
+      # PostgreSQL configuration for noproc tests (external server)
+      - POSTGRESQL_HOST=postgres-external
+      - POSTGRESQL_PORT=5432
+      - POSTGRESQL_USER=postgres
+      - POSTGRESQL_PASSWORD=postgres
+      # Test environment
+      - POSTGRES=17
+      - TMPDIR=/tmp/pytest-postgresql
+      # Coverage configuration
+      - COVERAGE_FILE=/tmp/pytest-postgresql/.coverage
+    command: pytest tests/ -v --tb=short -o addopts="" --cov=pytest_postgresql --cov-report=term --cov-report=html --cov-report=json --cov-branch
+    depends_on:
+      postgres-external:
+        condition: service_healthy
+    tmpfs:
+      # Use tmpfs for faster test execution
+      - /tmp/pytest-postgresql:exec,mode=1777
+
+  # External PostgreSQL server for noproc tests
+  postgres-external:
+    image: postgres:17
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    tmpfs:
+      # Use tmpfs for faster database operations
+      - /var/lib/postgresql/data:exec,mode=0700
+
+volumes:
+  test-results:

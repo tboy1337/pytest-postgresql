@@ -1,7 +1,6 @@
 """All tests for pytest-postgresql."""
 
 import shutil
-import sys
 
 import pytest
 from psycopg import Connection
@@ -15,8 +14,8 @@ SELECT_Q = "SELECT * FROM test_load;"
 
 
 @pytest.mark.skipif(
-    sys.platform == "win32" and not shutil.which("pg_ctl"),
-    reason="Requires pg_ctl not available on Windows without PostgreSQL installation"
+    not shutil.which("pg_ctl"),
+    reason="Requires pg_ctl - run via Docker: docker-compose -f docker-compose.tests.yml up"
 )
 def test_postgresql_proc(postgresql_proc: PostgreSQLExecutor) -> None:
     """Test different postgresql versions."""

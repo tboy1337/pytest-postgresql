@@ -1,7 +1,6 @@
 """Test behavior of postgres_options passed in different ways."""
 
-import os
-import platform
+import shutil
 from pathlib import Path
 
 import pytest
@@ -14,11 +13,11 @@ from pytest_postgresql.factories.noprocess import xdistify_dbname
 from pytest_postgresql.janitor import DatabaseJanitor
 from tests.loader import load_database
 
-# Skip all plugin tests on Windows without pg_ctl since they use pytester
+# Skip all plugin tests without pg_ctl since they use pytester
 # which spawns subprocess pytest sessions that need postgresql_proc
 pytestmark = pytest.mark.skipif(
-    platform.system() == "Windows" and not os.path.exists("C:\\Program Files\\PostgreSQL"),
-    reason="Requires pg_ctl not available on Windows without PostgreSQL installation"
+    not shutil.which("pg_ctl"),
+    reason="Requires pg_ctl - run via Docker: docker-compose -f docker-compose.tests.yml up"
 )
 
 

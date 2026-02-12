@@ -2,6 +2,7 @@
 
 import os
 import platform
+import shutil
 import subprocess
 from typing import Any
 from unittest.mock import MagicMock, Mock, patch
@@ -78,8 +79,8 @@ def test_unsupported_version(request: FixtureRequest) -> None:
 @pytest.mark.xdist_group(name="executor_no_xdist_guard")
 @pytest.mark.parametrize("locale", ("en_US.UTF-8", "de_DE.UTF-8", "nl_NO.UTF-8"))
 @pytest.mark.skipif(
-    platform.system() == "Windows" and not os.path.exists("C:\\Program Files\\PostgreSQL"),
-    reason="Requires pg_ctl not available on Windows without PostgreSQL installation"
+    not shutil.which("pg_ctl"),
+    reason="Requires pg_ctl - run via Docker: docker-compose -f docker-compose.tests.yml up"
 )
 def test_executor_init_with_password(
     request: FixtureRequest,
@@ -109,8 +110,8 @@ def test_executor_init_with_password(
 
 
 @pytest.mark.skipif(
-    platform.system() == "Windows" and not os.path.exists("C:\\Program Files\\PostgreSQL"),
-    reason="Requires pg_ctl not available on Windows without PostgreSQL installation"
+    not shutil.which("pg_ctl"),
+    reason="Requires pg_ctl - run via Docker: docker-compose -f docker-compose.tests.yml up"
 )
 def test_executor_init_bad_tmp_path(
     request: FixtureRequest,
@@ -141,8 +142,8 @@ postgres_with_password = postgresql_proc(password="hunter2")
 
 
 @pytest.mark.skipif(
-    platform.system() == "Windows" and not os.path.exists("C:\\Program Files\\PostgreSQL"),
-    reason="Requires pg_ctl not available on Windows without PostgreSQL installation"
+    not shutil.which("pg_ctl"),
+    reason="Requires pg_ctl - run via Docker: docker-compose -f docker-compose.tests.yml up"
 )
 def test_proc_with_password(
     postgres_with_password: PostgreSQLExecutor,
@@ -178,8 +179,8 @@ postgres_max_conns = postgresql("postgresql_max_conns_proc")
 
 
 @pytest.mark.skipif(
-    platform.system() == "Windows" and not os.path.exists("C:\\Program Files\\PostgreSQL"),
-    reason="Requires pg_ctl not available on Windows without PostgreSQL installation"
+    not shutil.which("pg_ctl"),
+    reason="Requires pg_ctl - run via Docker: docker-compose -f docker-compose.tests.yml up"
 )
 def test_postgres_options(postgres_max_conns: Connection) -> None:
     """Check that max connections (-N 42) is honored."""
@@ -192,8 +193,8 @@ postgres_isolation_level = postgresql("postgresql_proc", isolation_level=psycopg
 
 
 @pytest.mark.skipif(
-    platform.system() == "Windows" and not os.path.exists("C:\\Program Files\\PostgreSQL"),
-    reason="Requires pg_ctl not available on Windows without PostgreSQL installation"
+    not shutil.which("pg_ctl"),
+    reason="Requires pg_ctl - run via Docker: docker-compose -f docker-compose.tests.yml up"
 )
 def test_custom_isolation_level(postgres_isolation_level: Connection) -> None:
     """Check that a client fixture with a custom isolation level works."""

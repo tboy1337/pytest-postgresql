@@ -1,0 +1,74 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# Testing and coverage
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.tox/
+.hypothesis/
+*.cover
+coverage.json
+.mypy_cache/
+.ruff_cache/
+
+# Documentation
+docs/_build/
+docs/.build/
+*.rst~
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+wheels/
+
+# Docker
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Miscellaneous
+*.log
+*.pid
+*.seed
+*.pid.lock
+.env
+.env.local
+oldest/
+
+# Keep only what we need
+!pyproject.toml
+!README.rst
+!pytest_postgresql/
+!tests/
+!.coveragerc

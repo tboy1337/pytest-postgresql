@@ -1,7 +1,6 @@
 """Test for NoopExecutor."""
 
-import os
-import platform
+import shutil
 from typing import Any
 from unittest.mock import MagicMock, patch
 
@@ -15,8 +14,8 @@ from pytest_postgresql.retry import retry
 
 
 @pytest.mark.skipif(
-    platform.system() == "Windows" and not os.path.exists("C:\\Program Files\\PostgreSQL"),
-    reason="Requires pg_ctl not available on Windows without PostgreSQL installation"
+    not shutil.which("pg_ctl"),
+    reason="Requires pg_ctl - run via Docker: docker-compose -f docker-compose.tests.yml up"
 )
 def test_noproc_version(postgresql_proc: PostgreSQLExecutor) -> None:
     """Test the way postgresql version is being read.
@@ -38,8 +37,8 @@ def test_noproc_version(postgresql_proc: PostgreSQLExecutor) -> None:
 
 
 @pytest.mark.skipif(
-    platform.system() == "Windows" and not os.path.exists("C:\\Program Files\\PostgreSQL"),
-    reason="Requires pg_ctl not available on Windows without PostgreSQL installation"
+    not shutil.which("pg_ctl"),
+    reason="Requires pg_ctl - run via Docker: docker-compose -f docker-compose.tests.yml up"
 )
 def test_noproc_cached_version(postgresql_proc: PostgreSQLExecutor) -> None:
     """Test that the version is being cached."""

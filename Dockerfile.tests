@@ -1,0 +1,66 @@
+FROM python:3.14-slim
+
+# Install PostgreSQL 17 and dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg \
+    lsb-release \
+    && rm -rf /var/lib/apt/lists/*
+
+# Add PostgreSQL APT repository (modern method without deprecated apt-key)
+RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' && \
+    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /etc/apt/trusted.gpg.d/postgresql.gpg
+
+# Install PostgreSQL 17 with all necessary binaries
+RUN apt-get update && apt-get install -y \
+    postgresql-17 \
+    postgresql-client-17 \
+    postgresql-contrib-17 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Add PostgreSQL binaries to PATH
+ENV PATH="/usr/lib/postgresql/17/bin:${PATH}"
+
+# Create non-root user for running tests
+RUN useradd -m -u 1000 testuser && \
+    mkdir -p /home/testuser/.postgresql && \
+    chown -R testuser:testuser /home/testuser
+
+# Set working directory
+WORKDIR /app
+
+# Copy project files
+COPY --chown=testuser:testuser pyproject.toml .
+COPY --chown=testuser:testuser README.rst .
+COPY --chown=testuser:testuser pytest_postgresql pytest_postgresql/
+COPY --chown=testuser:testuser tests tests/
+COPY --chown=testuser:testuser .coveragerc .
+
+# Install the package and test dependencies
+RUN pip install --no-cache-dir -e . && \
+    pip install --upgrade --no-cache-dir \
+    pytest \
+    pytest-cov \
+    pytest-xdist \
+    pytest-timeout \
+    pytest-mock \
+    pytest-asyncio \
+    hypothesis \
+    psycopg \
+    port-for \
+    mirakuru \
+    packaging
+
+# Create directory for test data
+RUN mkdir -p /tmp/pytest-postgresql && \
+    chown -R testuser:testuser /tmp/pytest-postgresql
+
+# Switch to non-root user
+USER testuser
+
+# Set environment variables for PostgreSQL
+ENV POSTGRESQL_EXEC=/usr/lib/postgresql/17/bin/pg_ctl
+ENV TMPDIR=/tmp/pytest-postgresql
+
+# Default command runs all tests without coverage (use docker-compose command override for coverage)
+CMD ["pytest", "tests/", "-v", "--tb=short", "-p", "no:cov"]
