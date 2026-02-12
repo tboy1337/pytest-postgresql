@@ -1,13 +1,24 @@
 """Template database tests."""
 
+import os
+
 import pytest
 from psycopg import Connection
 
-from pytest_postgresql.factories import postgresql, postgresql_proc
+from pytest_postgresql.factories import postgresql, postgresql_noproc
 from tests.loader import load_database
 
-postgresql_proc_with_template = postgresql_proc(
-    port=21987,
+# Docker-based fixtures for cross-platform compatibility
+DOCKER_HOST = os.environ.get("POSTGRESQL_HOST", "localhost")
+DOCKER_PORT = int(os.environ.get("POSTGRESQL_PORT", "5433"))
+DOCKER_USER = os.environ.get("POSTGRESQL_USER", "postgres")
+DOCKER_PASSWORD = os.environ.get("POSTGRESQL_PASSWORD", "postgres")
+
+postgresql_proc_with_template = postgresql_noproc(
+    host=DOCKER_HOST,
+    port=DOCKER_PORT,
+    user=DOCKER_USER,
+    password=DOCKER_PASSWORD,
     dbname="stories_templated",
     load=[load_database],
 )

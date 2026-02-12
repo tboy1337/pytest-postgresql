@@ -1,6 +1,10 @@
 """Chaining noprocess fixtures tests for pytest-postgresql."""
 
+import os
+import sys
+
 import psycopg
+import pytest
 
 from pytest_postgresql import factories
 from pytest_postgresql.executor import PostgreSQLExecutor
@@ -33,12 +37,25 @@ def load_more_data(host: str, port: int, user: str, dbname: str, password: str |
             conn.commit()
 
 
-# Chaining: proc -> noproc -> client
-base_proc = factories.postgresql_proc(load=[load_schema])
+# Docker-based fixtures for cross-platform compatibility
+DOCKER_HOST = os.environ.get("POSTGRESQL_HOST", "localhost")
+DOCKER_PORT = int(os.environ.get("POSTGRESQL_PORT", "5433"))
+DOCKER_USER = os.environ.get("POSTGRESQL_USER", "postgres")
+DOCKER_PASSWORD = os.environ.get("POSTGRESQL_PASSWORD", "postgres")
+
+# Chaining: noproc -> noproc -> client (using Docker instead of proc)
+base_proc = factories.postgresql_noproc(
+    host=DOCKER_HOST,
+    port=DOCKER_PORT,
+    user=DOCKER_USER,
+    password=DOCKER_PASSWORD,
+    dbname="tests_chaining",  # Unique dbname to avoid template conflicts
+    load=[load_schema],
+)
 seeded_noproc = factories.postgresql_noproc(depends_on="base_proc", load=[load_data])
 client_layered = factories.postgresql("seeded_noproc")
 
-# Deeper chaining: proc -> noproc -> noproc -> client
+# Deeper chaining: noproc -> noproc -> noproc -> client
 more_seeded_noproc = factories.postgresql_noproc(depends_on="seeded_noproc", load=[load_more_data])
 client_deep_layered = factories.postgresql("more_seeded_noproc")
 
@@ -93,7 +110,7 @@ def test_chaining_three_layers(client_deep_layered: psycopg.Connection) -> None:
         assert results[1][0] == "more_data_layer"
 
 
-def test_inheritance(base_proc: PostgreSQLExecutor, seeded_noproc: NoopExecutor) -> None:
+def test_inheritance(base_proc: NoopExecutor, seeded_noproc: NoopExecutor) -> None:
     """Verify that connection parameters are inherited from the base fixture."""
     assert seeded_noproc.host == base_proc.host
     assert seeded_noproc.port == base_proc.port
