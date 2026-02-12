@@ -2,6 +2,7 @@
 
 import pytest
 
+import pytest_postgresql
 from pytest_postgresql.executor import PostgreSQLExecutor
 
 
@@ -21,3 +22,13 @@ def test_versions(ctl_input: str, version: str) -> None:
     match = PostgreSQLExecutor.VERSION_RE.search(ctl_input)
     assert match is not None
     assert match.groupdict()["version"] == version
+
+
+def test_package_version() -> None:
+    """Test that package version is accessible."""
+    assert hasattr(pytest_postgresql, "__version__")
+    assert isinstance(pytest_postgresql.__version__, str)
+    assert len(pytest_postgresql.__version__) > 0
+    # Version should follow semantic versioning pattern (x.y.z)
+    parts = pytest_postgresql.__version__.split(".")
+    assert len(parts) >= 2  # At least major.minor
