@@ -400,19 +400,22 @@ Docker-Based Testing
 
 For running all tests including those requiring PostgreSQL binaries (``pg_ctl``), use Docker:
 
-**Windows (PowerShell):**
+.. code-block:: bash
 
-.. code-block:: powershell
+    python run-docker-tests.py
 
-    .\run-docker-tests.ps1
+This runs all 213 tests in a containerized environment with PostgreSQL 17 pre-installed, regardless of your host OS.
 
-**Linux/macOS (Bash):**
+Additional options:
 
 .. code-block:: bash
 
-    ./run-docker-tests.sh
-
-This runs all 213 tests in a containerized environment with PostgreSQL 17 pre-installed, regardless of your host OS.
+    python run-docker-tests.py tests/test_executor.py  # Run specific test file
+    python run-docker-tests.py --no-coverage           # Run without coverage
+    python run-docker-tests.py --build-only            # Only build Docker image
+    python run-docker-tests.py --no-build              # Skip build, use existing image
+    python run-docker-tests.py --quiet                 # Less verbose output
+    python run-docker-tests.py --help                  # Show all options
 
 For detailed documentation, see `docs/docker-testing.md <docs/docker-testing.md>`_.
 
