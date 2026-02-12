@@ -234,7 +234,6 @@ def pytest_collection_modifyitems(config, items):
     
     # Separate pg_ctl tests from others
     pg_ctl_tests = []
-    pytester_tests = []
     other_tests = []
     
     for item in items:
@@ -245,15 +244,8 @@ def pytest_collection_modifyitems(config, items):
             for m in skip_markers
         )
         
-        # Check if test uses pytester (these don't work well in Docker nested subprocess)
-        uses_pytester = "test_postgres_options_plugin.py" in item.nodeid or "pytester" in str(item.fixturenames)
-        
         if needs_pg_ctl:
-            if uses_pytester:
-                # Skip pytester tests entirely - they don't work in Docker subprocess
-                pytester_tests.append(item)
-            else:
-                pg_ctl_tests.append(item)
+            pg_ctl_tests.append(item)
         else:
             other_tests.append(item)
     
